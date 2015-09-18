@@ -3,6 +3,13 @@ from random import choice
 from collections import deque as queue
 from math import floor
 
+class ObjectProbPair:
+    def __init__(self):
+        self.pairs = []
+    def __contains__(self,key):
+        return key.element in [obj.element for obj in self.pairs]
+
+
 class ProbDict:
     def __init__(self):
         self.mappings = {}
@@ -29,7 +36,6 @@ class AbstractElement:
         self.isTerminal = terminal
 
         return
-
 
 #MarkovModel takes a sequence of sequences and a depth and creates a model using
 # the ProbDict class. Class must be instantiated before calling any of its methods.

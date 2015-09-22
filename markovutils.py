@@ -3,11 +3,18 @@ from random import choice
 from collections import deque as queue
 from math import floor
 
-class ObjectProbPair:
+class AbstractElementIndex:
     def __init__(self):
-        self.pairs = []
+        self.weights = {}
+    def iteritems(self):
+        return weights.iteritems()
     def __contains__(self,key):
-        return key.element in [obj.element for obj in self.pairs]
+        return key.element in [obj.element for obj in self.weights.iterkeys()]
+    def bump(self,aelem):
+        if aelem not in self.weights:
+            self.weights[aelem] = 1
+        else:
+            self.weights[aelem] += 1
 
 
 class ProbDict:
@@ -17,12 +24,12 @@ class ProbDict:
     def insert(self,key,value):
         if key in self.mappings:
             if value in self.mappings[key].iterkeys():
-                self.mappings[key][value] += 1
+                self.mappings[key].bump(value)
             else:
-                self.mappings[key][value] = 1
+                self.mappings[key].bump(value)
         else:
-            self.mappings[key] = {}
-            self.mappings[key][value] = 1
+            self.mappings[key] = AbstractElementIndex()
+            self.mappings[key].bump(value)
         return
     def getByKey(self,key):
         weightedlist = []

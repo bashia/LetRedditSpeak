@@ -2,47 +2,20 @@ from random import random as rand
 from random import choice
 from collections import deque as queue
 from math import floor
-
-class AbstractElementIndex:
-    def __init__(self):
-        self.weights = {}
-    def iteritems(self):
-        return weights.iteritems()
-    def __contains__(self,key):
-        return key.element in [obj.element for obj in self.weights.iterkeys()]
-    def bump(self,aelem):
-        if aelem not in self.weights:
-            self.weights[aelem] = 1
-        else:
-            self.weights[aelem] += 1
-
-
-class ProbDict:
-    def __init__(self):
-        self.mappings = {}
-        return
-    def insert(self,key,value):
-        if key in self.mappings:
-            if value in self.mappings[key].iterkeys():
-                self.mappings[key].bump(value)
-            else:
-                self.mappings[key].bump(value)
-        else:
-            self.mappings[key] = AbstractElementIndex()
-            self.mappings[key].bump(value)
-        return
-    def getByKey(self,key):
-        weightedlist = []
-        for elem, weight in self.mappings[key].iteritems():
-            weightedlist.extend([elem]*weight)
-        return choice(weightedlist)
+from probdict import ProbDict
 
 class AbstractElement:
     def __init__(self, element, terminal=False):
         self.element = element
         self.isTerminal = terminal
-
         return
+    def __eq__(self,other):
+        if isinstance(other, self.__class__):
+            return self.element == other.element and self.isTerminal == other.isTerminal
+        else:
+            return False
+    def __hash__(self):
+        return self.element.__hash__()
 
 #MarkovModel takes a sequence of sequences and a depth and creates a model using
 # the ProbDict class. Class must be instantiated before calling any of its methods.
@@ -68,25 +41,25 @@ class MarkovModel:
             if (len(running_list) < self.depth):
                 running_list.append(wrappedelem)
             else:
-                self.mappings.insert(tuple(running_list),wrappedelem)
+                self.mappings[tuple(running_list)] = wrappedelem
                 running_list.popleft()
                 running_list.append(wrappedelem)
         return
 
     def generate(self):
-        running_list = queue(choice(list(self.mappings.mappings.iterkeys())))
+        running_list = queue(choice(list(self.mappings.data.keys())))
         generated_sequence = []
         for elem in running_list:
             generated_sequence.append(elem.element)
             if elem.isTerminal:
                 return generated_sequence
-        next_elem = self.mappings.getByKey(tuple(running_list))
+        next_elem = self.mappings[tuple(running_list)]
         running_list.popleft()
         running_list.append(next_elem)
         generated_sequence.append(next_elem.element)
 
         while not next_elem.isTerminal:
-            next_elem = self.mappings.getByKey(tuple(running_list))
+            next_elem = self.mappings[tuple(running_list)]
             running_list.popleft()
             running_list.append(next_elem)
             generated_sequence.append(next_elem.element)

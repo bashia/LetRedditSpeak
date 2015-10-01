@@ -29,6 +29,7 @@ class MarkovModel:
 
     def __init__(self,metasequence = [],depth = 1):
         self.mappings = ProbDict()
+        self.initlists = ProbDict()
         self.depth = depth
         for sequence in metasequence:
             self.resynth(sequence)
@@ -40,6 +41,8 @@ class MarkovModel:
             wrappedelem = AbstractElement(element,i == len(sequence)-1)
             if (len(running_list) < self.depth):
                 running_list.append(wrappedelem)
+                if (i == self.depth-1):
+                    self.initlists[None] = tuple(running_list)
             else:
                 self.mappings[tuple(running_list)] = wrappedelem
                 running_list.popleft()
@@ -47,7 +50,7 @@ class MarkovModel:
         return
 
     def generate(self):
-        running_list = queue(choice(list(self.mappings.data.keys())))
+        running_list = queue(self.initlists[None])
         generated_sequence = []
         for elem in running_list:
             generated_sequence.append(elem.element)

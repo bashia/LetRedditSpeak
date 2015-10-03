@@ -15,7 +15,7 @@ class AbstractElement:
         else:
             return False
     def __hash__(self):
-        return self.element.__hash__()
+        return hash((self.element,self.isTerminal))
 
 #MarkovModel takes a sequence of sequences and a depth and creates a model using
 # the ProbDict class. Class must be instantiated before calling any of its methods.
